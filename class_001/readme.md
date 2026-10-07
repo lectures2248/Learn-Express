@@ -122,14 +122,20 @@ We will now add the CRUD code one by one in place of the `// CRUD code will go h
 ## Step 6: Create (Add a New Student)
 
 ```javascript
-app.post("/students", async (req, res) => {
+
+app.post("/products", async (req, res) => {
   try {
-    const student = await Student.create(req.body);
-    res.status(201).json(student);
+    // kitne products hain gino, +1 karke naya id do
+    const total = await Product.countDocuments();
+    req.body._id = total + 1;
+
+    const product = await Product.create(req.body);
+    res.status(201).json(product);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
+
 ```
 
 `Student.create()` takes the data from the request body and saves it in the database. Status `201` means something new was created.
