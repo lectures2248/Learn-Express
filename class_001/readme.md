@@ -178,45 +178,41 @@ app.get("/students/:id", async (req, res) => {
 ## Step 9: Update a Student
 
 ```javascript
-app.put("/students/:id", async (req, res) => {
+app.put("/products/:id", async (req, res) => {
   try {
-    const student = await Student.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const product = await Product.findById(req.params.id);
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
 
-    res.json(student);
+    await Product.updateOne({ _id: req.params.id }, req.body);
+    res.json({ message: "Product updated" });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ message: "Invalid ID" });
   }
 });
-```
 
-- `new: true` returns the updated record instead of the old one.
-- `runValidators: true` makes sure the schema rules still apply while updating.
+```
 
 ---
 
 ## Step 10: Delete a Student
 
 ```javascript
-app.delete("/students/:id", async (req, res) => {
+app.delete("/products/:id", async (req, res) => {
   try {
-    const student = await Student.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
     }
 
-    res.json({ message: "Student deleted successfully" });
+    await Product.deleteOne({ _id: req.params.id });
+    res.json({ message: "Product deleted" });
   } catch (err) {
     res.status(400).json({ message: "Invalid ID" });
   }
-});
 ```
 
 ---
