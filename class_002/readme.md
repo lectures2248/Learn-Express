@@ -83,20 +83,19 @@ const getStudentById = async (req, res) => {
 ```javascript
 const updateStudent = async (req, res) => {
   try {
-    const student = await Student.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const student = await Student.findById(req.params.id);
 
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    res.json(student);
+    await Student.updateOne({ _id: req.params.id }, req.body);
+    res.json({ message: "Student updated" });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ message: "Invalid ID" });
   }
 };
+
 ```
 
 ---
