@@ -90,6 +90,14 @@ const updateStudent = async (req, res) => {
     }
 
     await Student.updateOne({ _id: req.params.id }, req.body);
+
+    ///-------------or-------------------
+
+    //await Student.updateOne(
+      //{ _id: req.params.id },
+     // { $set: { name, age } }
+    ///);
+
     res.json({ message: "Student updated" });
   } catch (err) {
     res.status(400).json({ message: "Invalid ID" });
