@@ -1,40 +1,88 @@
-# Express.js Routes and Controllers
+# Express.js Routes and Controllers: Category Notes
+
+---
 
 ## Step 1: Folder Structure
 
 ```
-student-api/
+notes-api/
 ├── controllers/
-│   └── studentController.js
+│   └── categoryController.js
 ├── models/
-│   └── Student.js
+│   └── Category.js
 ├── routes/
-│   └── studentRoutes.js
+│   └── categoryRoutes.js
 ├── index.js
 └── package.json
 ```
 
-`models/Student.js` will remain same as class 1.
-
 ---
 
-## Step 2: Create the Controller
+## Step 2: Install Packages
 
-Open `controllers/studentController.js` and import the model:
+```bash
+npm init -y
+npm install express mongoose
+npm install --save-dev nodemon
+```
 
-```javascript
-const Student = require("../models/Student");
+Add the `dev` script in `package.json`:
+
+```json
+"scripts": {
+  "dev": "nodemon index.js"
+}
 ```
 
 ---
 
-## Step 3: Create Student
+## Step 3: Create the Category Model
+
+Open `models/Category.js`:
 
 ```javascript
-const createStudent = async (req, res) => {
+const mongoose = require("mongoose");
+
+const categorySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Category", categorySchema);
+```
+
+`timestamps: true` adds `createdAt` and `updatedAt` automatically.
+
+---
+
+## Step 4: Create the Controller
+
+Open `controllers/categoryController.js` and import the model:
+
+```javascript
+const Category = require("../models/Category");
+```
+
+---
+
+## Step 5: Create Category
+
+```javascript
+const createCategory = async (req, res) => {
   try {
-    const student = await Student.create(req.body);
-    res.status(201).json(student);
+    const category = await Category.create(req.body);
+    res.status(201).json(category);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -43,13 +91,13 @@ const createStudent = async (req, res) => {
 
 ---
 
-## Step 4: Get All Students
+## Step 6: Get All Categories
 
 ```javascript
-const getStudents = async (req, res) => {
+const getCategories = async (req, res) => {
   try {
-    const students = await Student.find();
-    res.json(students);
+    const categories = await Category.find();
+    res.json(categories);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -58,18 +106,18 @@ const getStudents = async (req, res) => {
 
 ---
 
-## Step 5: Get One Student by ID
+## Step 7: Get One Category by ID
 
 ```javascript
-const getStudentById = async (req, res) => {
+const getCategoryById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
+    const category = await Category.findById(req.params.id);
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    res.json(student);
+    res.json(category);
   } catch (err) {
     res.status(400).json({ message: "Invalid ID" });
   }
@@ -78,48 +126,48 @@ const getStudentById = async (req, res) => {
 
 ---
 
-## Step 6: Update Student
+## Step 8: Update Category
 
 ```javascript
-const updateStudent = async (req, res) => {
+const updateCategory = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
+    const category = await Category.findById(req.params.id);
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    await Student.updateOne({ _id: req.params.id }, req.body);
+    await Category.updateOne({ _id: req.params.id }, req.body);
 
     ///-------------or-------------------
 
-    //await Student.updateOne(
-      //{ _id: req.params.id },
-     // { $set: { name, age } }
-    ///);
+    // const { name, description } = req.body;
+    // await Category.updateOne(
+    //   { _id: req.params.id },
+    //   { $set: { name, description } }
+    // );
 
-    res.json({ message: "Student updated" });
+    res.json({ message: "Category updated" });
   } catch (err) {
     res.status(400).json({ message: "Invalid ID" });
   }
 };
-
 ```
 
 ---
 
-## Step 7: Delete Student
+## Step 9: Delete Category
 
 ```javascript
-const deleteStudent = async (req, res) => {
+const deleteCategory = async (req, res) => {
   try {
-    const student = await Student.findByIdAndDelete(req.params.id);
+    const category = await Category.findByIdAndDelete(req.params.id);
 
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
     }
 
-    res.json({ message: "Student deleted successfully" });
+    res.json({ message: "Category deleted successfully" });
   } catch (err) {
     res.status(400).json({ message: "Invalid ID" });
   }
@@ -128,79 +176,77 @@ const deleteStudent = async (req, res) => {
 
 ---
 
-## Step 8: Export the Functions
+## Step 10: Export the Functions
 
-At the end of `studentController.js`:
+At the end of `categoryController.js`:
 
 ```javascript
 module.exports = {
-  createStudent,
-  getStudents,
-  getStudentById,
-  updateStudent,
-  deleteStudent,
+  createCategory,
+  getCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
 };
 ```
 
 ---
 
-## Step 9: Create the Routes
+## Step 11: Create the Routes
 
-Open `routes/studentRoutes.js`:
+Open `routes/categoryRoutes.js`:
 
 ```javascript
 const express = require("express");
 const {
-  createStudent,
-  getStudents,
-  getStudentById,
-  updateStudent,
-  deleteStudent,
-} = require("../controllers/studentController");
+  createCategory,
+  getCategories,
+  getCategoryById,
+  updateCategory,
+  deleteCategory,
+} = require("../controllers/categoryController");
 
 const router = express.Router();
 
-router.post("/", createStudent);
-router.get("/", getStudents);
-router.get("/:id", getStudentById);
-router.put("/:id", updateStudent);
-router.delete("/:id", deleteStudent);
+router.post("/", createCategory);
+router.get("/", getCategories);
+router.get("/:id", getCategoryById);
+router.put("/:id", updateCategory);
+router.delete("/:id", deleteCategory);
 
 module.exports = router;
 ```
 
 ---
 
-## Step 10: Update index.js
-
-Remove the CRUD code from `index.js` and use the routes file:
+## Step 12: Create index.js
 
 ```javascript
 const express = require("express");
 const mongoose = require("mongoose");
-const studentRoutes = require("./routes/studentRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 const app = express();
 
 app.use(express.json());
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/studentdb")
+  .connect("mongodb://127.0.0.1:27017/notesdb")
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("Connection error:", err.message));
 
-app.use("/students", studentRoutes);
+app.use("/categories", categoryRoutes);
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");
 });
 ```
 
-`/students` will be added before every route in `studentRoutes.js`, so `router.get("/:id")` becomes `/students/:id`.
+`/categories` will be added before every route in `categoryRoutes.js`, so `router.get("/:id")` becomes `/categories/:id`.
 
 ---
 
-## Step 11: Run the Project
+## Step 13: Run the Project
 
 ```bash
 npm run dev
@@ -214,3 +260,4 @@ MongoDB connected
 ```
 
 ---
+
